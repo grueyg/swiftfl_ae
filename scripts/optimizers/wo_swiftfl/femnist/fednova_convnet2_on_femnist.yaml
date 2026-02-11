@@ -1,0 +1,49 @@
+use_gpu: True
+device: 0
+seed: 12345
+federate:
+  method: FedNova
+  mode: standalone
+  total_round_num: 1000
+  client_num: 3500
+  sample_client_num: 350
+  resource_info_file: data/client_device_capacity
+  augmentation_factor: 1.0
+  merge_test_data: True
+  make_global_eval: True
+data:
+  root: data
+  type: femnist
+  splits: [0.8,0.0,0.2]
+  subsample: 0.33
+  transform: [['ToTensor'], ['Normalize', {'mean': [0.9637], 'std': [0.1592]}]]
+dataloader:
+  batch_size: 20
+model:
+  type: convnet2
+  hidden: 2048
+  out_channels: 62
+  dropout: 0.5
+train:
+  local_update_steps: 1
+  batch_or_epoch: epoch
+  optimizer:
+    type: 'FedNova'
+    lr: 0.5
+    gmf: 0
+    mu: 0
+    momentum: 0
+    dampening: 0
+    weight_decay: 0
+    nesterov: False
+    variance: 0
+grad:
+  grad_clip: 5.0
+criterion:
+  type: CrossEntropyLoss
+trainer:
+  type: fednovatrainer
+eval:
+  best_res_update_round_wise_key: test_acc
+  freq: 1
+  metrics: ['acc', 'correct']

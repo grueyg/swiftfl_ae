@@ -1,0 +1,47 @@
+use_gpu: True
+device: 0
+seed: 12345
+federate:
+  method: PAPAYA
+  mode: standalone
+  total_round_num: 10000
+  client_num: 1100
+  sample_client_num: 110
+  resource_info_file: data/client_device_capacity
+  augmentation_factor: 0.03
+data:
+  root: data/
+  type: shakespeare
+  splits: [0.8,0.0,0.2]
+  subsample: 0.2
+dataloader:
+  batch_size: 64
+model:
+  type: lstm
+  in_channels: 80
+  out_channels: 80
+  embed_size: 8
+  hidden: 256
+  dropout: 0.0
+train:
+  local_update_steps: 1
+  batch_or_epoch: epoch
+  optimizer:
+    lr: 0.8
+    weight_decay: 0.0
+criterion:
+  type: character_loss
+trainer:
+  type: nlptrainer
+eval:
+  best_res_update_round_wise_key: test_acc
+  freq: 30
+  metrics: ['acc', 'correct']
+asyn:
+  use: True
+  min_received_num: 8
+  staleness_toleration: 16
+  staleness_discount_factor: 1.0
+  aggregator: goal_achieved # {'goal_achieved', 'time_up'}
+  broadcast_manner: after_receiving # {'after_aggregating', 'after_receiving'}
+  overselection: False

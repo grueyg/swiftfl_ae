@@ -1,0 +1,47 @@
+use_gpu: True
+device: 0
+seed: 1
+federate:
+  method: PyramidFL
+  mode: standalone
+  total_round_num: 1000
+  client_num: 1000
+  sample_client_num: 100
+  make_global_eval: True
+  merge_test_data: True
+  resource_info_file: data/client_device_capacity
+  augmentation_factor: 1.0
+  sampler: oort
+data:
+  root: data/
+  type: 'CIFAR10@torchvision'
+  splits: [1.0, 0.0, 0.0]
+  num_workers: 0
+  transform: [['ToTensor'], ['Normalize', {'mean': [0.4914, 0.4822, 0.4465], 'std': [0.2470, 0.2435, 0.2616]}]]
+  test_transform: [['ToTensor'], ['Normalize', {'mean': [0.4914, 0.4822, 0.4465], 'std': [0.2470, 0.2435, 0.2616]}]]
+  args: [{'download': False}]
+  splitter: 'lda'
+  splitter_args: [{'alpha': 0.2}]
+dataloader:
+  batch_size: 64
+model:
+  type: resnet18
+  out_channels: 10
+train:
+  local_update_steps: 1
+  batch_or_epoch: epoch
+  optimizer:
+    lr: 0.001
+    weight_decay: 0.0
+grad:
+  grad_clip: 5.0
+criterion:
+  type: CrossEntropyLoss
+trainer:
+  type: SpecTrainer
+eval:
+  best_res_update_round_wise_key: test_acc
+  freq: 10
+  metrics: ['acc', 'correct']
+oort:
+  use: True

@@ -1,0 +1,32 @@
+numpy==1.22.4
+scikit-learn==1.0.2
+scipy==1.7.3
+pandas
+grpcio
+grpcio-tools
+pyyaml
+fvcore
+iopath
+wandb
+tensorboard
+tensorboardX
+pympler
+protobuf==3.19.4
+matplotlib
+pytest
+pytest-cov
+pre-commit
+networkx
+torch-geometric==2.0.4
+# torch_sparse==0.6.13
+# pip install torch-sparse==0.6.13 -f https://pytorch-geometric.com/whl/torch-1.10.0+cu113.html
+nltk
+transformers==4.16.2
+tokenizers==0.10.3
+datasets
+sentencepiece
+textgrid
+typeguard
+openml==0.12.2
+timm
+einops

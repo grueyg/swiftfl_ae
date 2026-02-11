@@ -1,0 +1,44 @@
+use_gpu: True
+device: 0
+seed: 12345
+federate:
+  method: PyramidFL
+  mode: standalone
+  total_round_num: 1000
+  client_num: 1100
+  sample_client_num: 110
+  resource_info_file: data/client_device_capacity
+  augmentation_factor: 0.03
+  merge_test_data: True
+  make_global_eval: True
+  sampler: oort
+data:
+  root: data/
+  type: shakespeare
+  splits: [0.8,0.0,0.2]
+  subsample: 0.2
+dataloader:
+  batch_size: 64
+model:
+  type: lstm
+  in_channels: 80
+  out_channels: 80
+  embed_size: 8
+  hidden: 256
+  dropout: 0.0
+train:
+  local_update_steps: 1
+  batch_or_epoch: epoch
+  optimizer:
+    lr: 0.8
+    weight_decay: 0.0
+criterion:
+  type: character_loss
+trainer:
+  type: nlptrainer
+eval:
+  best_res_update_round_wise_key: test_acc
+  freq: 4
+  metrics: ['acc', 'correct']
+oort:
+  use: True

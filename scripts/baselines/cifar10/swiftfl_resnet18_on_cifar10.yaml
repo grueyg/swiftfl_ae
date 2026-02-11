@@ -1,0 +1,77 @@
+use_gpu: True
+device: 0
+seed: 1
+federate:
+  method: IdpSpec
+  mode: standalone
+  total_round_num: 1000
+  client_num: 1000
+  sample_client_num: 100
+  resource_info_file: data/client_device_capacity
+  augmentation_factor: 1.0
+  make_global_eval: True
+  merge_test_data: True
+  sampler: spec_opt
+data:
+  root: data/
+  type: 'CIFAR10@torchvision'
+  splits: [1.0, 0.0, 0.0]
+  num_workers: 0
+  transform: [['ToTensor'], ['Normalize', {'mean': [0.4914, 0.4822, 0.4465], 'std': [0.2470, 0.2435, 0.2616]}]]
+  test_transform: [['ToTensor'], ['Normalize', {'mean': [0.4914, 0.4822, 0.4465], 'std': [0.2470, 0.2435, 0.2616]}]]
+  args: [{'download': True}]
+  splitter: 'iid'
+  splitter_args: [{'alpha': 1.0}]
+dataloader:
+  batch_size: 64
+model:
+  type: resnet18
+  out_channels: 10
+train:
+  local_update_steps: 1
+  batch_or_epoch: epoch
+  optimizer:
+    lr: 0.01
+    weight_decay: 0.0
+grad:
+  grad_clip: 5.0
+criterion:
+  type: CrossEntropyLoss
+trainer:
+  type: SpecTrainer
+eval:
+  best_res_update_round_wise_key: test_acc
+  freq: 50
+  metrics: ['acc', 'correct']
+spec:
+  use: True
+  warm_round: 0
+  predict_freq: 10
+  do_compensation: True
+  overselection: 1.5
+  recover_round: 1000
+  recover_eval_freq: 10
+  hessian_approx_lambda: 1.0
+  normal_spec_lambda: 0.7
+  sample_client_rate: 0.1
+  sampler: optimal_all
+  predictor:
+    type: default
+    model_type: cv
+    model_args: [{"hid_S": 16,
+                  "hid_T": 256,
+                  "N_S": 4,
+                  "N_T": 4,
+                  "model_type": 'incepu'}]
+    in_channel: 9
+    patch_size: 32
+    pre_seq_length: 5
+    aft_seq_length: 1
+    sum_seq_length: 1
+    criterion: [{'criterion_type': 'MSELoss'}]
+    optimizer: [{'type': 'Adam', 'lr': 0.0001}]
+    device: 1
+    epochs: 10
+    train_size: 0.8
+    do_validation: True
+    topk: 0.2

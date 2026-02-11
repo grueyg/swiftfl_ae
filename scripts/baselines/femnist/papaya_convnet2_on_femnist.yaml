@@ -1,0 +1,50 @@
+use_gpu: True
+device: 0
+seed: 12345
+federate:
+  method: PAPAYA
+  mode: standalone
+  total_round_num: 10000
+  client_num: 3500
+  sample_client_num: 350
+  resource_info_file: data/client_device_capacity
+  augmentation_factor: 1.0
+  make_global_eval: True
+  merge_test_data: True
+data:
+  root: data/
+  type: femnist
+  splits: [0.8,0.0,0.2]
+  subsample: 0.33
+  transform: [['ToTensor'], ['Normalize', {'mean': [0.9637], 'std': [0.1592]}]]
+dataloader:
+  batch_size: 20
+model:
+  type: convnet2
+  hidden: 2048
+  out_channels: 62
+  dropout: 0.5
+train:
+  local_update_steps: 1
+  batch_or_epoch: epoch
+  optimizer:
+    lr: 0.5
+    weight_decay: 0.0
+grad:
+  grad_clip: 5.0
+criterion:
+  type: CrossEntropyLoss
+trainer:
+  type: cvtrainer
+eval:
+  best_res_update_round_wise_key: test_acc
+  freq: 10
+  metrics: ['acc', 'correct']
+asyn:
+  use: True
+  min_received_num: 40
+  staleness_toleration: 16
+  staleness_discount_factor: 1.0
+  aggregator: goal_achieved # {'goal_achieved', 'time_up'}
+  broadcast_manner: after_receiving # {'after_aggregating', 'after_receiving'}
+  overselection: False

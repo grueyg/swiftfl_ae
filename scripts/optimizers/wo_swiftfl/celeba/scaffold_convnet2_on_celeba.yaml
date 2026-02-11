@@ -1,0 +1,46 @@
+use_gpu: True
+device: 0
+seed: 12345
+federate:
+  method: Scaffold
+  mode: standalone
+  total_round_num: 1000
+  client_num: 9300
+  sample_client_num: 930
+  resource_info_file: data/client_device_capacity
+  augmentation_factor: 1.0
+  merge_test_data: True
+  make_global_eval: True
+data:
+  root: data
+  type: celeba
+  splits: [0.8,0.0,0.2]
+  subsample: 0.1
+  transform: [['ToTensor'], ['Normalize', {'mean': [0.485, 0.456, 0.406], 'std': [0.229, 0.224, 0.225]}]]
+dataloader:
+  batch_size: 5
+model:
+  type: convnet2
+  hidden: 2048
+  out_channels: 2
+  dropout: 0.0
+train: 
+  local_update_steps: 1
+  batch_or_epoch: epoch
+  optimizer:
+    type: 'Scaffold'
+    lr: 0.001
+grad:
+  grad_clip: 5.0
+criterion:
+  type: CrossEntropyLoss
+trainer:
+  type: scaffoldtrainer
+eval:
+  best_res_update_round_wise_key: test_acc
+  freq: 10
+  start_interval_eval_round: 10
+  metrics: ['acc', 'correct']
+scaffold:
+  use: True
+  server_learning_rate: 1.0

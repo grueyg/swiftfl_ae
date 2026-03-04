@@ -8,11 +8,9 @@ SwiftFL is implemented on top of FederatedScope and enables speculative training
 
 ---
 
-# Quick Start
+## Installation
 
-## 1. Installation
-
-### Install Miniconda (if not already installed)
+### Install Miniconda
 
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-py39_23.1.0-1-Linux-x86_64.sh
@@ -36,8 +34,10 @@ conda activate swiftfl
 ### Install PyTorch (CUDA 11.3 version)
 
 ```bash
-conda install -y pytorch=1.10.1 torchvision=0.11.2 \
-torchaudio=0.10.1 torchtext=0.11.1 cudatoolkit=11.3
+pip install torch==1.10.1+cu111 torchvision==0.11.2+cu111 torchaudio==0.10.1 \
+    -f https://download.pytorch.org/whl/cu111/torch_stable.html
+pip install torch-sparse==0.6.13 \
+    -f https://pytorch-geometric.com/whl/torch-1.10.0+cu113.html
 ```
 
 If you do not have GPU support, install the CPU-only version of PyTorch.
@@ -47,7 +47,7 @@ If you do not have GPU support, install the CPU-only version of PyTorch.
 ### Install SwiftFL
 
 ```bash
-cd SwiftFL
+cd swiftfl_ae
 pip install -e .[dev,app]
 ```
 
@@ -55,9 +55,7 @@ This will install SwiftFL and its dependencies.
 
 ---
 
-# Experiment E1: Minimal End-to-End Example
-
-## Purpose
+## Experiment E1: Minimal End-to-End Example
 
 The original large-scale experiments in the paper involve thousands of simulated clients and require up to 214 hours for full reproduction.
 
@@ -65,20 +63,16 @@ To facilitate artifact evaluation, we provide a **minimal reproducible example**
 
 * Model: ConvNet2
 * Dataset: FEMNIST
-* Total number of clients reduced by 10×
-* All other hyperparameters remain unchanged
+* Total number of clients reduced by 10×.
+* All other hyperparameters remain unchanged.
 
 This configuration preserves heterogeneity and speculative execution behavior while completing in minutes.
 
 ---
 
-## Run the Example
+### Run the Example
 
-Configuration files are located under:
-
-```
-scripts/example/
-```
+Configuration files are located under `scripts/example/`.
 
 Run:
 
@@ -89,13 +83,9 @@ python federatedscope/main.py \
 
 ---
 
-## Expected Output
+### Expected Output
 
-Results are stored under:
-
-```
-exp/femnist/...
-```
+Results are stored under `exp/femnist/...`
 
 Key log files:
 
@@ -131,15 +121,11 @@ Successful execution should show:
 
 ---
 
-# Experiment E2: Comparison with Other FL Methods
+## Experiment E2: Comparison with Other FL Methods
 
 This experiment corresponds to **Section 7.2, Table 3 and Figure 9** in the paper.
 
-All configurations are located under:
-
-```
-scripts/baselines/
-```
+All configurations are located under `scripts/baselines/`.
 
 These include SwiftFL and the following baseline systems:
 
@@ -150,7 +136,7 @@ These include SwiftFL and the following baseline systems:
 
 ---
 
-## Run a Specific Configuration
+### Run a Specific Configuration
 
 Example: SwiftFL with ConvNet2 on FEMNIST
 
@@ -161,7 +147,7 @@ python federatedscope/main.py \
 
 ---
 
-## Batch Execution
+### Batch Execution
 
 Each dataset directory contains a `run.sh` script that executes all configurations sequentially:
 
@@ -177,15 +163,12 @@ Running a subset of models or datasets is sufficient to observe the performance 
 
 ---
 
-# Experiment E3: Evaluation Across FDL Optimizers
+## Experiment E3: Evaluation Across FDL Optimizers
 
 This experiment corresponds to **Section 7.2, Table 2**.
 
-Configurations are located under:
+Configurations are located under `scripts/optimizers/`.
 
-```
-scripts/optimizers/
-```
 
 Two subdirectories are provided:
 
@@ -201,7 +184,7 @@ Supported optimizers include:
 
 ---
 
-## Execution
+### Execution
 
 Run any configuration as:
 
@@ -215,7 +198,7 @@ Full reproduction takes approximately:
 
 ---
 
-## Expected Output
+### Expected Output
 
 Output format is identical to E1.
 
@@ -229,7 +212,7 @@ Running a subset of optimizers is sufficient to reproduce the behavior described
 
 ---
 
-# Hardware Requirements
+## Hardware Requirements
 
 * Minimal example (E1):
 
@@ -237,7 +220,20 @@ Running a subset of optimizers is sufficient to reproduce the behavior described
   * 64GB RAM
 * Full reproduction (E2 + E3):
 
-  * 2×A100 GPUs
+  * 2×A100 GPUs (recommended)
   * 1TB RAM
   * 512GB disk
 
+
+A100 GPUs are not strictly required for E2/E3. Using other NVIDIA GPUs (e.g., P100 16GB) is fine for validating the same performance trends; the main difference is longer runtime.
+
+If GPU memory becomes a constraint (e.g., with many simulated clients), you can reduce the client scale in the YAML configs. For example, in `scripts/baselines/femnist/swiftfl_convnet2_on_femnist.yaml`:
+
+```
+federate:
+  total_round_num: 1000
+  client_num: 3500        # decrease if needed
+  sample_client_num: 350  # decrease accordingly
+```
+
+With these adjustments, the experiments remain valid for comparing relative speedups/trends, though the absolute end-to-end time will differ.

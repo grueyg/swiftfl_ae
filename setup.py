@@ -20,9 +20,9 @@ dev_requires = test_requires + ['pre-commit', 'networkx', 'matplotlib']
 org_requires = ['paramiko==2.11.0', 'celery[redis]', 'cmd2']
 
 app_requires = [
-    'torch-geometric==2.0.4', 'torch_sparse==0.6.13', 'nltk', 'transformers==4.16.2',
+    'torch-geometric==2.0.4', 'nltk', 'transformers==4.16.2',
     'tokenizers==0.10.3', 'datasets', 'sentencepiece', 'textgrid', 'typeguard',
-    'openml==0.12.2', 'timm==0.6.13'
+    'openml==0.12.2', 'timm==0.6.13', 'einops'
 ]
 
 benchmark_hpo_requires = [
